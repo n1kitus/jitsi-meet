@@ -12,6 +12,7 @@ import {
     IconOutlook,
     IconYahoo
 } from '../../../../base/icons';
+import { browser } from '../../../../base/lib-jitsi-meet';
 import { Tooltip } from '../../../../base/tooltip';
 import { copyText } from '../../../../base/util';
 
@@ -68,11 +69,13 @@ function InviteByEmailSection({ inviteSubject, inviteText, t }: Props) {
      * @returns {React$Element<any>}
      */
     function renderEmailIcons() {
+        const mailtoTarget = browser.isFirefox() ? '_self' : '_blank';
         const PROVIDER_MAPPING = [
             {
                 icon: IconEmail,
                 tooltipKey: 'addPeople.defaultEmail',
-                url: `mailto:?subject=${encodedInviteSubject}&body=${encodedInviteText}`
+                url: `mailto:?subject=${encodedInviteSubject}&body=${encodedInviteText}`,
+                target: mailtoTarget
             },
             {
                 icon: IconGoogle,
@@ -95,7 +98,7 @@ function InviteByEmailSection({ inviteSubject, inviteText, t }: Props) {
         return (
             <>
                 {
-                    PROVIDER_MAPPING.map(({ icon, tooltipKey, url }, idx) => (
+                    PROVIDER_MAPPING.map(({ icon, tooltipKey, url, target }, idx) => (
                         <Tooltip
                             content = { t(tooltipKey) }
                             key = { idx }
@@ -103,8 +106,7 @@ function InviteByEmailSection({ inviteSubject, inviteText, t }: Props) {
                             <a
                                 className = 'provider-icon'
                                 href = { url }
-                                rel = 'noopener noreferrer'
-                                target = '_blank'>
+                                target = { target || '_blank' }>
                                 <Icon src = { icon } />
                             </a>
                         </Tooltip>
