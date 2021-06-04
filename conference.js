@@ -1086,17 +1086,6 @@ export default {
     },
 
     /**
-     * Sends the given feedback through CallStats if enabled.
-     *
-     * @param overallFeedback an integer between 1 and 5 indicating the
-     * user feedback
-     * @param detailedFeedback detailed feedback from the user. Not yet used
-     */
-    sendFeedback(overallFeedback, detailedFeedback) {
-        return room.sendFeedback(overallFeedback, detailedFeedback);
-    },
-
-    /**
      * Get speaker stats that track total dominant speaker time.
      *
      * @returns {object} A hash with keys being user ids and values being the
@@ -1983,7 +1972,12 @@ export default {
 
         room.on(
             JitsiConferenceEvents.CONFERENCE_UNIQUE_ID_SET,
-            (...args) => APP.store.dispatch(conferenceUniqueIdSet(room, ...args)));
+            (...args) => {
+                // Preserve the sessionId so that the value is accessible even after room
+                // is disconnected.
+                room.sessionId = room.getMeetingUniqueId();
+                APP.store.dispatch(conferenceUniqueIdSet(room, ...args));
+            });
 
         room.on(
             JitsiConferenceEvents.AUTH_STATUS_CHANGED,
@@ -2803,14 +2797,11 @@ export default {
             requestFeedbackPromise = Promise.resolve(true);
         }
 
-        // All promises are returning Promise.resolve to make Promise.all to
-        // be resolved when both Promises are finished. Otherwise Promise.all
-        // will reject on first rejected Promise and we can redirect the page
-        // before all operations are done.
         Promise.all([
             requestFeedbackPromise,
             this.leaveRoomAndDisconnect()
-        ]).then(values => {
+        ])
+        .then(values => {
             this._room = undefined;
             room = undefined;
 
