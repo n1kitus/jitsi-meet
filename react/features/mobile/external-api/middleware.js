@@ -11,6 +11,9 @@ import {
     CONFERENCE_JOINED,
     CONFERENCE_LEFT,
     CONFERENCE_WILL_JOIN,
+    CONFERENCE_WILL_LEAVE,
+    CONFERENCE_HANGUP,
+    KICKED_OUT,
     JITSI_CONFERENCE_URL_KEY,
     SET_ROOM,
     forEachConference,
@@ -28,7 +31,14 @@ import {
 import { JitsiConferenceEvents } from '../../base/lib-jitsi-meet';
 import { MEDIA_TYPE } from '../../base/media';
 import { SET_AUDIO_MUTED, SET_VIDEO_MUTED } from '../../base/media/actionTypes';
-import { PARTICIPANT_JOINED, PARTICIPANT_LEFT, getParticipants, getParticipantById } from '../../base/participants';
+import {
+    PARTICIPANT_JOINED,
+    PARTICIPANT_LEFT,
+    PARTICIPANT_KICKED,
+    getParticipantCount,
+    getParticipants,
+    getParticipantById
+} from '../../base/participants';
 import { MiddlewareRegistry, StateListenerRegistry } from '../../base/redux';
 import { toggleScreensharing } from '../../base/tracks';
 import { OPEN_CHAT, CLOSE_CHAT } from '../../chat';
@@ -119,6 +129,7 @@ MiddlewareRegistry.register(store => next => action => {
 
     case CONFERENCE_LEFT:
     case CONFERENCE_WILL_JOIN:
+    case CONFERENCE_WILL_LEAVE:
         _sendConferenceEvent(store, action);
         break;
 
@@ -126,6 +137,34 @@ MiddlewareRegistry.register(store => next => action => {
         _sendConferenceEvent(store, action);
         _registerForEndpointTextMessages(store);
         break;
+
+    case CONFERENCE_HANGUP: {
+        const { getState } = store;
+        const numParticipants = getParticipantCount(getState);
+
+        sendEvent(
+            store,
+            type,
+            /* data */ {
+                numParticipants
+            });
+        break;
+    }
+
+    case KICKED_OUT: {
+        const { kicked } = action;
+        const { getState } = store;
+        const numParticipants = getParticipantCount(getState);
+
+        sendEvent(
+            store,
+            type,
+            /* data */ {
+                id: kicked,
+                numParticipants
+            });
+        break;
+    }
 
     case CONNECTION_DISCONNECTED: {
         // FIXME: This is a hack. See the description in the JITSI_CONNECTION_CONFERENCE_KEY constant definition.
@@ -182,8 +221,11 @@ MiddlewareRegistry.register(store => next => action => {
     }
 
     case PARTICIPANT_JOINED:
-    case PARTICIPANT_LEFT: {
+    case PARTICIPANT_LEFT:
+    case PARTICIPANT_KICKED: {
         const { participant } = action;
+        const { getState } = store;
+        const numParticipants = getParticipantCount(getState);
 
         sendEvent(
             store,
@@ -195,7 +237,8 @@ MiddlewareRegistry.register(store => next => action => {
                 participantId: participant.id,
                 displayName: participant.displayName,
                 avatarUrl: participant.avatarURL,
-                role: participant.role
+                role: participant.role,
+                numParticipants
             });
         break;
     }
@@ -502,6 +545,9 @@ function _sendConferenceEvent(
         }) {
     const { conference, type, ...data } = action;
 
+    const { getState } = store;
+    const numParticipants = getParticipantCount(getState);
+
     // For these (redux) actions, conference identifies a JitsiConference
     // instance. The external API cannot transport such an object so we have to
     // transport an "equivalent".
@@ -509,7 +555,10 @@ function _sendConferenceEvent(
         data.url = _normalizeUrl(conference[JITSI_CONFERENCE_URL_KEY]);
     }
 
-    if (_swallowEvent(store, action, data)) {
+    if (_swallowEvent(store, action, {
+        ...data,
+        numParticipants
+    })) {
         return;
     }
 
@@ -525,7 +574,10 @@ function _sendConferenceEvent(
         break;
     }
 
-    sendEvent(store, type_, data);
+    sendEvent(store, type_, {
+        ...data,
+        numParticipants
+    });
 }
 
 /**

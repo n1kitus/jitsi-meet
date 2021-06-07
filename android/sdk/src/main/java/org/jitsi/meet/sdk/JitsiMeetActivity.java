@@ -217,6 +217,14 @@ public class JitsiMeetActivity extends FragmentActivity
         }
     }
 
+    protected void onParticipantKicked(HashMap<String, Object> extraData) {
+            try {
+                JitsiMeetLogger.i("Participant kicked: ", extraData);
+            } catch (Exception e) {
+                JitsiMeetLogger.w("Invalid participant kicked extraData", e);
+            }
+        }
+
     // Activity lifecycle methods
     //
 
@@ -297,6 +305,9 @@ public class JitsiMeetActivity extends FragmentActivity
                     break;
                 case PARTICIPANT_LEFT:
                     onParticipantLeft(event.getData());
+                    break;
+                case PARTICIPANT_KICKED:
+                    onParticipantKicked(event.getData());
                     break;
             }
         }

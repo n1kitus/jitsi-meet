@@ -70,6 +70,13 @@
 - (void)participantLeft:(NSDictionary *)data;
 
 /**
+ * Called when a participant has left the conference.
+ *
+ * The `data` dictionary contains a `participantId` key with the id of the participant that has left.
+ */
+- (void)participantKicked:(NSDictionary *)data;
+
+/**
  * Called when audioMuted state changed.
  *
  * The `data` dictionary contains a `muted` key with state of the audioMuted for the localParticipant.
@@ -110,5 +117,29 @@
  * The `data` dictionary contains a `muted` key with state of the videoMuted for the localParticipant.
  */
 - (void)videoMutedChanged:(NSDictionary *)data;
+
+/**
+ * Called when a conference is about to be left.
+ *
+ * The `data` dictionary contains:
+ *    `conference`: conference object
+ */
+ - (void)conferenceWillLeave:(NSDictionary *)data;
+
+/**
+ * Called when the current user is kicked out.
+ *
+ * The `data` dictionary contains:
+ *    `numParticipants`: conference object
+ */
+ - (void)kickedOut:(NSDictionary *)data;
+
+/**
+ * Called when the current user is tapped hangup button but before leaving the conference.
+ *
+ * The `data` dictionary contains:
+ *    `numParticipants`: conference object
+ */
+ - (void)conferenceHangup:(NSDictionary *)data;
 
 @end

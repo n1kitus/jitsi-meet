@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 import { createToolbarEvent, sendAnalytics } from '../../analytics';
 import { appNavigate } from '../../app/actions';
+import { CONFERENCE_HANGUP } from '../../base/conference';
 import { disconnect } from '../../base/connection';
 import { translate } from '../../base/i18n';
 import { connect } from '../../base/redux';
@@ -44,6 +45,7 @@ class HangupButton extends AbstractHangupButton<Props, *> {
 
         this._hangup = _.once(() => {
             sendAnalytics(createToolbarEvent('hangup'));
+            this.props.dispatch({ type: CONFERENCE_HANGUP });
 
             // FIXME: these should be unified.
             if (navigator.product === 'ReactNative') {

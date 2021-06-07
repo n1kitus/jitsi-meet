@@ -42,6 +42,8 @@ export const CONFERENCE_JOINED = 'CONFERENCE_JOINED';
  */
 export const CONFERENCE_LEFT = 'CONFERENCE_LEFT';
 
+export const CONFERENCE_HANGUP = 'CONFERENCE_HANGUP';
+
 /**
  * The type of (redux) action, which indicates conference subject changes.
  *
