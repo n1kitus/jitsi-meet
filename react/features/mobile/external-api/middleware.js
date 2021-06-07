@@ -199,12 +199,16 @@ MiddlewareRegistry.register(store => next => action => {
     case LOAD_CONFIG_ERROR: {
         const { error, locationURL } = action;
 
+        const { getState } = store;
+        const numParticipants = getParticipantCount(getState);
+
         sendEvent(
             store,
             CONFERENCE_TERMINATED,
             /* data */ {
                 error: _toErrorString(error),
-                url: _normalizeUrl(locationURL)
+                url: _normalizeUrl(locationURL),
+                numParticipants
             });
         break;
     }
@@ -510,11 +514,15 @@ function _maybeTriggerEarlyConferenceWillJoin(store, action) {
     const { locationURL } = store.getState()['features/base/connection'];
     const { room } = action;
 
+    const { getState } = store;
+    const numParticipants = getParticipantCount(getState);
+
     isRoomValid(room) && locationURL && sendEvent(
         store,
         CONFERENCE_WILL_JOIN,
         /* data */ {
-            url: _normalizeUrl(locationURL)
+            url: _normalizeUrl(locationURL),
+            numParticipants
         });
 }
 

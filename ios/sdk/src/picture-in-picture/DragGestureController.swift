@@ -16,9 +16,15 @@
 
 import UIKit
 
+public protocol DragGestureControllerDelegate: class {
+    func dragEnded()
+}
+
 final class DragGestureController {
 
     var insets: UIEdgeInsets = UIEdgeInsets.zero
+
+    public weak var delegate: DragGestureControllerDelegate?
 
     private var frameBeforeDragging: CGRect = CGRect.zero
     private weak var view: UIView?
@@ -76,9 +82,12 @@ final class DragGestureController {
                            options: .curveLinear,
                            animations: {
                             view.frame = frame
-            }, completion: nil)
+            }, completion: { [weak self]  _ in
+                            self?.delegate?.dragEnded()
+            })
 
         default:
+            self.delegate?.dragEnded()
             break
         }
     }

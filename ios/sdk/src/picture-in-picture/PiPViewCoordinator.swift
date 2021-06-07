@@ -19,7 +19,7 @@ import UIKit
 public typealias AnimationCompletion = (Bool) -> Void
 
 public protocol PiPViewCoordinatorDelegate: class {
-    
+
     func exitPictureInPicture()
 }
 
@@ -45,14 +45,20 @@ public class PiPViewCoordinator {
         case lowerLeftCorner
         case upperLeftCorner
     }
-    
+
     public var initialPositionInSuperview = Position.lowerRightCorner
-    
+
     // Unused. Remove on the next major release.
     @available(*, deprecated, message: "The PiP window size is now fixed to 150px.")
     public var c: CGFloat = 0.0
-    
+
     public weak var delegate: PiPViewCoordinatorDelegate?
+
+    public weak var dragDelegate: DragGestureControllerDelegate? {
+         didSet {
+            dragController.delegate = dragDelegate
+         }
+    }
 
     private(set) var isInPiP: Bool = false // true if view is in PiP mode
 
@@ -66,6 +72,8 @@ public class PiPViewCoordinator {
 
     public init(withView view: UIView) {
         self.view = view
+        self.view.layer.cornerRadius = 8
+        self.view.clipsToBounds = true
     }
 
     /// Configure the view to be always on top of all the contents
@@ -114,7 +122,7 @@ public class PiPViewCoordinator {
         dragController.insets = dragBoundInsets
 
         // add single tap gesture recognition for displaying exit PiP UI
-        let exitSelector = #selector(toggleExitPiP)
+        let exitSelector = #selector(exitPictureInPicture)
         let tapGestureRecognizer = UITapGestureRecognizer(target: self,
                                                           action: exitSelector)
         self.tapGestureRecognizer = tapGestureRecognizer
@@ -136,7 +144,7 @@ public class PiPViewCoordinator {
         let exitSelector = #selector(toggleExitPiP)
         tapGestureRecognizer?.removeTarget(self, action: exitSelector)
         tapGestureRecognizer = nil
-        
+
         delegate?.exitPictureInPicture()
     }
 
@@ -189,7 +197,7 @@ public class PiPViewCoordinator {
 
     // MARK: - Size calculation
 
-    private func animateViewChange() {
+    public func animateViewChange() {
         UIView.animate(withDuration: 0.25) {
             self.view.frame = self.changeViewRect()
             self.view.setNeedsLayout()
@@ -209,7 +217,7 @@ public class PiPViewCoordinator {
         let origin = initialPositionFor(pipSize: size, bounds: adjustedBounds)
         return CGRect(x: origin.x, y: origin.y, width: size.width, height: size.height)
     }
-    
+
     private func initialPositionFor(pipSize size: CGSize, bounds: CGRect) -> CGPoint {
         switch initialPositionInSuperview {
         case .lowerLeftCorner:
