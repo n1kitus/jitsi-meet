@@ -81,6 +81,10 @@ public class BroadcastEvent {
         AUDIO_MUTED_CHANGED("org.jitsi.meet.AUDIO_MUTED_CHANGED"),
         PARTICIPANT_JOINED("org.jitsi.meet.PARTICIPANT_JOINED"),
         PARTICIPANT_LEFT("org.jitsi.meet.PARTICIPANT_LEFT"),
+        PARTICIPANT_KICKED("org.jitsi.meet.PARTICIPANT_KICKED"),
+        CONFERENCE_WILL_LEAVE("org.jitsi.meet.CONFERENCE_WILL_LEAVE"),
+        CONFERENCE_HANGUP("org.jitsi.meet.CONFERENCE_HANGUP"),
+        KICKED_OUT("org.jitsi.meet.KICKED_OUT"),
         ENDPOINT_TEXT_MESSAGE_RECEIVED("org.jitsi.meet.ENDPOINT_TEXT_MESSAGE_RECEIVED"),
         SCREEN_SHARE_TOGGLED("org.jitsi.meet.SCREEN_SHARE_TOGGLED"),
         PARTICIPANTS_INFO_RETRIEVED("org.jitsi.meet.PARTICIPANTS_INFO_RETRIEVED"),
@@ -101,6 +105,10 @@ public class BroadcastEvent {
         private static final String CHAT_MESSAGE_RECEIVED_NAME = "CHAT_MESSAGE_RECEIVED";
         private static final String CHAT_TOGGLED_NAME = "CHAT_TOGGLED";
         private static final String VIDEO_MUTED_CHANGED_NAME = "VIDEO_MUTED_CHANGED";
+        private static final String PARTICIPANT_KICKED_NAME = "PARTICIPANT_KICKED";
+        private static final String CONFERENCE_WILL_LEAVE_NAME = "CONFERENCE_WILL_LEAVE";
+        private static final String CONFERENCE_HANGUP_NAME = "CONFERENCE_HANGUP";
+        private static final String KICKED_OUT_NAME = "KICKED_OUT";
 
         private final String action;
 
@@ -147,6 +155,14 @@ public class BroadcastEvent {
                     return CHAT_TOGGLED;
                 case VIDEO_MUTED_CHANGED_NAME:
                     return VIDEO_MUTED_CHANGED;
+                case PARTICIPANT_KICKED_NAME:
+                    return PARTICIPANT_KICKED;
+                case CONFERENCE_WILL_LEAVE_NAME:
+                    return CONFERENCE_WILL_LEAVE;
+                case CONFERENCE_HANGUP_NAME:
+                    return CONFERENCE_HANGUP;
+                case KICKED_OUT_NAME:
+                    return KICKED_OUT;
             }
 
             return null;

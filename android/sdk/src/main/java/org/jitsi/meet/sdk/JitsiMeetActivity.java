@@ -16,6 +16,7 @@
 
 package org.jitsi.meet.sdk;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +33,6 @@ import com.facebook.react.modules.core.PermissionListener;
 import org.jitsi.meet.sdk.log.JitsiMeetLogger;
 
 import java.util.HashMap;
-import android.app.Activity;
 
 /**
  * A base activity for SDK users to embed. It uses {@link JitsiMeetFragment} to do the heavy
@@ -218,12 +218,36 @@ public class JitsiMeetActivity extends FragmentActivity
     }
 
     protected void onParticipantKicked(HashMap<String, Object> extraData) {
-            try {
-                JitsiMeetLogger.i("Participant kicked: ", extraData);
-            } catch (Exception e) {
-                JitsiMeetLogger.w("Invalid participant kicked extraData", e);
-            }
+        try {
+            JitsiMeetLogger.i("Participant kicked: ", extraData);
+        } catch (Exception e) {
+            JitsiMeetLogger.w("Invalid participant kicked extraData", e);
         }
+    }
+
+    protected void onConferenceWillLeave(HashMap<String, Object> extraData) {
+        try {
+            JitsiMeetLogger.i("Conference Will Leave: ", extraData);
+        } catch (Exception e) {
+            JitsiMeetLogger.w("Invalid participant Will Leave extraData", e);
+        }
+    }
+
+    protected void onConferenceHangup(HashMap<String, Object> extraData) {
+        try {
+            JitsiMeetLogger.i("Conference Hangup: ", extraData);
+        } catch (Exception e) {
+            JitsiMeetLogger.w("Invalid participant Hangup extraData", e);
+        }
+    }
+
+    protected void onKickedOut(HashMap<String, Object> extraData) {
+        try {
+            JitsiMeetLogger.i("Conference KickedOut: ", extraData);
+        } catch (Exception e) {
+            JitsiMeetLogger.w("Invalid participant KickedOut extraData", e);
+        }
+    }
 
     // Activity lifecycle methods
     //
@@ -308,6 +332,15 @@ public class JitsiMeetActivity extends FragmentActivity
                     break;
                 case PARTICIPANT_KICKED:
                     onParticipantKicked(event.getData());
+                    break;
+                case CONFERENCE_WILL_LEAVE:
+                    onConferenceWillLeave(event.getData());
+                    break;
+                case CONFERENCE_HANGUP:
+                    onConferenceHangup(event.getData());
+                    break;
+                case KICKED_OUT:
+                    onKickedOut(event.getData());
                     break;
             }
         }
