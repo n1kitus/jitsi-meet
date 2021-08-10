@@ -34,8 +34,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.fragment:fragment:1.2.5'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.fragment:fragment:1.3.4'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
@@ -47,7 +47,7 @@ dependencies {
     implementation 'com.dropbox.core:dropbox-core-sdk:3.0.8'
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.squareup.duktape:duktape-android:1.3.0'
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.8.7'
 
     if (rootProject.ext.libreBuild) {
         implementation(project(':react-native-device-info')) {
@@ -78,7 +78,7 @@ dependencies {
     implementation project(':react-native-webrtc')
     implementation project(':react-native-webview')
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.1'
 }
 
 
@@ -98,8 +98,8 @@ android.libraryVariants.all { def variant ->
     def jsBundleFile = file("$jsBundleDir/index.android.bundle")
 
     def currentBundleTask = tasks.create(
-            name: "bundle${targetName}JsAndAssets",
-            type: Exec) {
+        name: "bundle${targetName}JsAndAssets",
+        type: Exec) {
         group = "react"
         description = "bundle JS and assets for ${targetName}."
 
@@ -125,15 +125,15 @@ android.libraryVariants.all { def variant ->
 
         // Run the bundler
         commandLine(
-                "node",
-                "node_modules/react-native/local-cli/cli.js",
-                "bundle",
-                "--platform", "android",
-                "--dev", "${devEnabled}",
-                "--reset-cache",
-                "--entry-file", "index.android.js",
-                "--bundle-output", jsBundleFile,
-                "--assets-dest", resourcesDir)
+            "node",
+            "node_modules/react-native/local-cli/cli.js",
+            "bundle",
+            "--platform", "android",
+            "--dev", "${devEnabled}",
+            "--reset-cache",
+            "--entry-file", "index.android.js",
+            "--bundle-output", jsBundleFile,
+            "--assets-dest", resourcesDir)
 
         // Disable bundling on dev builds
         enabled !devEnabled
